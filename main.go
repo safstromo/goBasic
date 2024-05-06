@@ -53,13 +53,17 @@ func main() {
 		switch participant.RaceType {
 
 		case Race1000m:
-			thousandMetersRace = append(thousandMetersRace, participant)
-
+			if idAndNameIsUnique(thousandMetersRace, participant) {
+				thousandMetersRace = append(thousandMetersRace, participant)
+			}
 		case EggRace:
-			eggRace = append(eggRace, participant)
-
+			if idAndNameIsUnique(eggRace, participant) {
+				eggRace = append(eggRace, participant)
+			}
 		case SackRace:
-			stackRace = append(stackRace, participant)
+			if idAndNameIsUnique(stackRace, participant) {
+				stackRace = append(stackRace, participant)
+			}
 		}
 	}
 
@@ -111,10 +115,10 @@ func parsePerson(file *os.File) []person {
 	return persons
 }
 
-func idAndNameIsUnique(personSlice []person, id int, name string) bool {
+func idAndNameIsUnique(personSlice []person, personToAdd person) bool {
 	for _, person := range personSlice {
-		if person.Id == id && person.Name == name {
-			fmt.Printf("Unable to parse person, Id or name is not unique: Id:'%v' Name:'%v' this exist: %v \n", id, name, person)
+		if person.Id == personToAdd.Id && person.Name == personToAdd.Name {
+			fmt.Printf("Unable to parse person, Id or name is not unique: Id:'%v' Name:'%v' this exist: %v \n", personToAdd.Id, personToAdd.Name, person)
 			return false
 		}
 	}
