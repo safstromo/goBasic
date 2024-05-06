@@ -42,8 +42,12 @@ func main() {
 		return
 	}
 
-	defer file.Close()
+	participants := parsePerson(file)
 
+	fmt.Println(participants)
+}
+
+func parsePerson(file *os.File) []person {
 	scanner := bufio.NewScanner(file)
 
 	scanner.Split(bufio.ScanLines)
@@ -62,6 +66,7 @@ func main() {
 		}
 
 		id, err := strconv.Atoi(split[1])
+
 		if err != nil {
 			fmt.Println(fmt.Errorf("Unable to parse Id: '%v' on line %v", split[1], lineNumber))
 			continue
@@ -80,8 +85,8 @@ func main() {
 
 	}
 
-	fmt.Println(persons)
-
+	file.Close()
+	return persons
 }
 
 func getRace(raceType string) (Race, error) {
