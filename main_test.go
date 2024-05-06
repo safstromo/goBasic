@@ -68,3 +68,37 @@ func TestParsePerson(t *testing.T) {
 	}
 
 }
+
+func TestIdAndNameIsUnique(t *testing.T) {
+	firstPerson := NewPerson(
+		"Paris Hilton",
+		4174331,
+		"11:54:45",
+		"11:59:53",
+		SackRace,
+	)
+	secondPerson := NewPerson(
+		"Hilton",
+		4174331,
+		"11:54:45",
+		"11:59:53",
+		SackRace,
+	)
+	thirdPerson := NewPerson(
+		"Bob",
+		4174231,
+		"11:54:45",
+		"11:59:53",
+		SackRace,
+	)
+
+	persons := []person{firstPerson}
+
+	if idIsUnique(persons, secondPerson) {
+		t.Errorf("The person is not unique this should be false")
+	}
+
+	if !idIsUnique(persons, thirdPerson) {
+		t.Errorf("The person is unique this should be true")
+	}
+}
