@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -20,6 +21,21 @@ const (
 type person struct {
 	Name  string
 	Races []race
+}
+
+func (p person) getTotalTime() (time.Duration, error) {
+
+	if len(p.Races) != 3 {
+		return 0, fmt.Errorf("%v did not participate in all 3 races.", p.Name)
+	}
+
+	sum := 0 * time.Second
+
+	for _, race := range p.Races {
+		sum += race.FinalTime
+	}
+
+	return sum, nil
 }
 
 type race struct {
@@ -57,8 +73,8 @@ func main() {
 
 	for _, person := range participants {
 		fmt.Println(person)
+		fmt.Println(person.getTotalTime())
 	}
-
 }
 
 func parsePerson(file *os.File) map[int]person {
