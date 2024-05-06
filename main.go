@@ -45,6 +45,7 @@ func main() {
 	participants := parsePerson(file)
 
 	fmt.Println(participants)
+	fmt.Println(len(participants))
 }
 
 func parsePerson(file *os.File) []person {

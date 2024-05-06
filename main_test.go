@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"os"
+	"testing"
+)
 
 func TestGetRaceSuccess(t *testing.T) {
 	eggRace := "eggRace"
@@ -33,6 +36,35 @@ func TestGetRaceFail(t *testing.T) {
 
 	if result != "" && err == nil {
 		t.Errorf("Invalid result, got '%s' '%s' , want 'Unable to parse Race type", result, err)
+	}
+
+}
+
+func TestParsePerson(t *testing.T) {
+	file, err := os.Open("testFile")
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer file.Close()
+
+	firstPerson := NewPerson(
+		"Paris Hilton",
+		4174331,
+		"11:54:45",
+		"11:59:53",
+		SackRace,
+	)
+
+	parsedPersons := parsePerson(file)
+
+	if len(parsedPersons) != 4 {
+		t.Errorf("Failed, number of persons is: %v ", len(parsedPersons))
+	}
+
+	if parsedPersons[0] != firstPerson {
+		t.Errorf("First person parsed is incorrect, got %v , expected %v", parsedPersons[0], firstPerson)
 	}
 
 }
