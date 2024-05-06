@@ -44,8 +44,28 @@ func main() {
 
 	participants := parsePerson(file)
 
-	fmt.Println(participants)
-	fmt.Println(len(participants))
+	var thousandMetersRace []person
+	var eggRace []person
+	var stackRace []person
+
+	for _, participant := range participants {
+
+		switch participant.RaceType {
+
+		case Race1000m:
+			thousandMetersRace = append(thousandMetersRace, participant)
+
+		case EggRace:
+			eggRace = append(eggRace, participant)
+
+		case SackRace:
+			stackRace = append(stackRace, participant)
+		}
+	}
+
+	fmt.Println(thousandMetersRace)
+	fmt.Println(eggRace)
+	fmt.Println(stackRace)
 }
 
 func parsePerson(file *os.File) []person {
@@ -80,14 +100,35 @@ func parsePerson(file *os.File) []person {
 			continue
 		}
 
-		person := NewPerson(split[0], id, split[2], split[3], race)
-
-		persons = append(persons, person)
+		if !idExistInRace(persons, id, race) {
+			person := NewPerson(split[0], id, split[2], split[3], race)
+			persons = append(persons, person)
+		}
 
 	}
 
 	file.Close()
 	return persons
+}
+
+func idAndNameIsUnique(personSlice []person, id int, name string) bool {
+	for _, person := range personSlice {
+		if person.Id == id && person.Name == name {
+			fmt.Printf("Unable to parse person, Id or name is not unique: Id:'%v' Name:'%v' this exist: %v \n", id, name, person)
+			return false
+		}
+	}
+	return true
+}
+
+func idExistInRace(personSlice []person, id int, race Race) bool {
+	for _, person := range personSlice {
+		if person.Id == id && person.RaceType == race {
+			fmt.Printf("A person with id: '%v' already exist %v \n", id, person)
+			return true
+		}
+	}
+	return false
 }
 
 func getRace(raceType string) (Race, error) {
