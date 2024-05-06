@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -19,6 +18,7 @@ const (
 )
 
 type person struct {
+	Id    int
 	Name  string
 	Races []race
 }
@@ -45,8 +45,9 @@ type race struct {
 	FinalTime time.Duration
 }
 
-func NewPerson(name string) *person {
+func NewPerson(name string, id int) *person {
 	return &person{
+		Id:    id,
 		Name:  name,
 		Races: make([]race, 0),
 	}
@@ -70,11 +71,42 @@ func main() {
 	}
 
 	participants := parsePerson(file)
+	printWinners(participants)
+
+}
+
+func printWinners(participants map[int]person) {
+
+	var winners []*person
+	var winnerTime time.Duration
 
 	for _, person := range participants {
-		fmt.Println(person)
-		fmt.Println(person.getTotalTime())
+
+		personTime, _ := person.getTotalTime()
+
+		if len(person.Races) == 3 {
+			if winners == nil || personTime <= winnerTime {
+				if personTime < winnerTime {
+					winners = nil
+				}
+				winners = append(winners, &person)
+				winnerTime = personTime
+
+			}
+		}
+
 	}
+
+	for _, winner := range winners {
+		totalTime, _ := winner.getTotalTime()
+		averageTime := totalTime / 3
+
+		fmt.Println("\n-------------------------------------------------\n")
+		fmt.Printf("Winner is %v with ID:%v \n", winner.Name, winner.Id)
+		fmt.Printf("Total time %v\n", totalTime.String())
+		fmt.Printf("Average time %v\n\n", averageTime.String())
+	}
+
 }
 
 func parsePerson(file *os.File) map[int]person {
@@ -123,7 +155,7 @@ func parsePerson(file *os.File) map[int]person {
 			person.Races = append(person.Races, *newRace)
 			persons[id] = person
 		} else {
-			newPerson := NewPerson(split[0])
+			newPerson := NewPerson(split[0], id)
 			newRace := NewRace(race, split[2], split[3], finalTime)
 			newPerson.Races = append(newPerson.Races, *newRace)
 			persons[id] = *newPerson
