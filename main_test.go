@@ -49,56 +49,15 @@ func TestParsePerson(t *testing.T) {
 
 	defer file.Close()
 
-	firstPerson := NewPerson(
-		"Paris Hilton",
-		4174331,
-		"11:54:45",
-		"11:59:53",
-		SackRace,
-	)
-
 	parsedPersons := parsePerson(file)
 
 	if len(parsedPersons) != 4 {
 		t.Errorf("Failed, number of persons is: %v ", len(parsedPersons))
 	}
 
-	if parsedPersons[0] != firstPerson {
-		t.Errorf("First person parsed is incorrect, got %v , expected %v", parsedPersons[0], firstPerson)
+	parisHiltonId := 4174331
+	if _, ok := parsedPersons[parisHiltonId]; !ok {
+		t.Errorf("Paris Hilton should exist in the map")
 	}
 
-}
-
-func TestIdAndNameIsUnique(t *testing.T) {
-	firstPerson := NewPerson(
-		"Paris Hilton",
-		4174331,
-		"11:54:45",
-		"11:59:53",
-		SackRace,
-	)
-	secondPerson := NewPerson(
-		"Hilton",
-		4174331,
-		"11:54:45",
-		"11:59:53",
-		SackRace,
-	)
-	thirdPerson := NewPerson(
-		"Bob",
-		4174231,
-		"11:54:45",
-		"11:59:53",
-		SackRace,
-	)
-
-	persons := []person{firstPerson}
-
-	if idIsUnique(persons, secondPerson) {
-		t.Errorf("The person is not unique this should be false")
-	}
-
-	if !idIsUnique(persons, thirdPerson) {
-		t.Errorf("The person is unique this should be true")
-	}
 }

@@ -8,29 +8,37 @@ import (
 	"strings"
 )
 
-type Race string
+type RaceType string
 
 const (
-	Race1000m Race = "1000m"
-	EggRace   Race = "eggRace"
-	SackRace  Race = "sackRace"
+	Race1000m RaceType = "1000m"
+	EggRace   RaceType = "eggRace"
+	SackRace  RaceType = "sackRace"
 )
 
 type person struct {
-	Name      string
-	Id        int
-	StartTime string
-	EndTime   string
-	RaceType  Race
+	Name  string
+	Races []race
 }
 
-func NewPerson(Name string, Id int, StartTime string, EndTime string, RaceType Race) person {
-	return person{
-		Name,
-		Id,
+type race struct {
+	RaceType  RaceType
+	StartTime string
+	EndTime   string
+}
+
+func NewPerson(name string) *person {
+	return &person{
+		Name:  name,
+		Races: make([]race, 0),
+	}
+}
+
+func NewRace(RaceType RaceType, StartTime string, EndTime string) *race {
+	return &race{
+		RaceType,
 		StartTime,
 		EndTime,
-		RaceType,
 	}
 }
 
@@ -44,40 +52,17 @@ func main() {
 
 	participants := parsePerson(file)
 
-	var thousandMetersRace []person
-	var eggRace []person
-	var stackRace []person
-
-	for _, participant := range participants {
-
-		switch participant.RaceType {
-
-		case Race1000m:
-			if idIsUnique(thousandMetersRace, participant) {
-				thousandMetersRace = append(thousandMetersRace, participant)
-			}
-		case EggRace:
-			if idIsUnique(eggRace, participant) {
-				eggRace = append(eggRace, participant)
-			}
-		case SackRace:
-			if idIsUnique(stackRace, participant) {
-				stackRace = append(stackRace, participant)
-			}
-		}
+	for _, person := range participants {
+		fmt.Println(person)
 	}
-
-	fmt.Println(thousandMetersRace)
-	fmt.Println(eggRace)
-	fmt.Println(stackRace)
 }
 
-func parsePerson(file *os.File) []person {
+func parsePerson(file *os.File) map[int]person {
 	scanner := bufio.NewScanner(file)
 
 	scanner.Split(bufio.ScanLines)
 
-	var persons []person
+	persons := make(map[int]person)
 
 	lineNumber := 0
 
@@ -104,9 +89,18 @@ func parsePerson(file *os.File) []person {
 			continue
 		}
 
-		if !idExistInRace(persons, id, race) {
-			person := NewPerson(split[0], id, split[2], split[3], race)
-			persons = append(persons, person)
+		person, ok := persons[id]
+
+		if ok {
+			newRace := NewRace(race, split[2], split[3])
+			person.Races = append(person.Races, *newRace)
+			persons[id] = person
+		} else {
+
+			newPerson := NewPerson(split[0])
+			newRace := NewRace(race, split[2], split[3])
+			newPerson.Races = append(newPerson.Races, *newRace)
+			persons[id] = *newPerson
 		}
 
 	}
@@ -115,27 +109,7 @@ func parsePerson(file *os.File) []person {
 	return persons
 }
 
-func idIsUnique(personSlice []person, personToAdd person) bool {
-	for _, person := range personSlice {
-		if person.Id == personToAdd.Id {
-			fmt.Printf("Unable to parse person, Id already exist: Id:'%v' this exist on the person: %v \n", personToAdd.Id, person)
-			return false
-		}
-	}
-	return true
-}
-
-func idExistInRace(personSlice []person, id int, race Race) bool {
-	for _, person := range personSlice {
-		if person.Id == id && person.RaceType == race {
-			fmt.Printf("A person with id: '%v' already exist %v \n", id, person)
-			return true
-		}
-	}
-	return false
-}
-
-func getRace(raceType string) (Race, error) {
+func getRace(raceType string) (RaceType, error) {
 	switch raceType {
 	case "1000m":
 		return Race1000m, nil
