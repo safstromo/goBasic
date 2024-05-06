@@ -61,3 +61,28 @@ func TestParsePerson(t *testing.T) {
 	}
 
 }
+
+func TestGetRaceTime(t *testing.T) {
+
+	start := "01:01:01"
+	end := "02:02:02"
+
+	duration, err := getRaceTime(start, end)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if duration.String() != "1h1m1s" {
+		t.Errorf("Invalid result, duration is: %v, expected 1h1m1s", duration)
+	}
+
+	start2 := "01:01:01"
+	end2 := "24:02:01"
+
+	duration2, err := getRaceTime(start2, end2)
+
+	if err == nil {
+		t.Errorf("Invalid result, duration should be an error but returned %v", duration2)
+	}
+
+}
