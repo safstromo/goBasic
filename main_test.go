@@ -10,19 +10,19 @@ func TestGetRaceSuccess(t *testing.T) {
 	thousandMeters := "1000m"
 	sackRace := "sackRace"
 
-	eggResult, err := getRace(eggRace)
+	eggResult, err := parseRace(eggRace)
 
 	if eggResult != EggRace || err != nil {
 		t.Errorf("Invalid result, got '%s', want '%s'", eggResult, eggRace)
 	}
 
-	thousandResult, err := getRace(thousandMeters)
+	thousandResult, err := parseRace(thousandMeters)
 
 	if thousandResult != Race1000m || err != nil {
 		t.Errorf("Invalid result, got '%s', want '%s'", thousandResult, eggRace)
 	}
 
-	sackResult, err := getRace(sackRace)
+	sackResult, err := parseRace(sackRace)
 
 	if sackResult != SackRace || err != nil {
 		t.Errorf("Invalid result, got '%s', want '%s'", sackResult, eggRace)
@@ -32,7 +32,7 @@ func TestGetRaceSuccess(t *testing.T) {
 
 func TestGetRaceFail(t *testing.T) {
 
-	result, err := getRace("1234")
+	result, err := parseRace("1234")
 
 	if result != "" && err == nil {
 		t.Errorf("Invalid result, got '%s' '%s' , want 'Unable to parse Race type", result, err)
@@ -49,9 +49,9 @@ func TestParsePerson(t *testing.T) {
 
 	defer file.Close()
 
-	parsedPersons := parsePerson(file)
+	parsedPersons := parsePersons(file)
 
-	if len(parsedPersons) != 4 {
+	if len(parsedPersons) != 3 {
 		t.Errorf("Failed, number of persons is: %v ", len(parsedPersons))
 	}
 
@@ -67,7 +67,7 @@ func TestGetRaceTime(t *testing.T) {
 	start := "01:01:01"
 	end := "02:02:02"
 
-	duration, err := getRaceTime(start, end)
+	duration, err := parseRaceTime(start, end)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -79,10 +79,43 @@ func TestGetRaceTime(t *testing.T) {
 	start2 := "01:01:01"
 	end2 := "24:02:01"
 
-	duration2, err := getRaceTime(start2, end2)
+	duration2, err := parseRaceTime(start2, end2)
 
 	if err == nil {
 		t.Errorf("Invalid result, duration should be an error but returned %v", duration2)
 	}
 
+}
+
+func TestValitateName(t *testing.T) {
+	name1 := "Test name"
+	name2 := "Test n8me"
+	name3 := ""
+	name4 := "T!st"
+
+	var err error
+
+	name1, err = validateName(name1)
+
+	if err != nil {
+		t.Errorf("Invalid result expected %v, got: %v", name1, err)
+	}
+
+	_, err = validateName(name2)
+
+	if err == nil {
+		t.Errorf("Invalid result expected %v, got: %v", name2, err)
+	}
+
+	_, err = validateName(name3)
+
+	if err == nil {
+		t.Errorf("Invalid result expected %v, got: %v", name3, err)
+	}
+
+	_, err = validateName(name4)
+
+	if err == nil {
+		t.Errorf("Invalid result expected %v, got: %v", name4, err)
+	}
 }

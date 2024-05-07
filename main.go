@@ -50,6 +50,7 @@ func parsePersons(file *os.File) map[int]person {
 
 		if err != nil {
 			log.Printf("%v on line %v", err, lineNumber)
+			continue
 		}
 
 		id, err := strconv.Atoi(split[1])
