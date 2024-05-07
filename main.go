@@ -14,16 +14,19 @@ func main() {
 	file, err := os.Open("race-results.txt")
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 
-	participants := parsePerson(file)
-	printWinners(participants)
+	participants := parsePersons(file)
+
+	file.Close()
+
+	calculateWinners(participants)
 
 }
 
-func printWinners(participants map[int]person) {
+func calculateWinners(participants map[int]person) {
 
 	var winners []*person
 	var winnerTime time.Duration
@@ -45,6 +48,11 @@ func printWinners(participants map[int]person) {
 
 	}
 
+	printWinners(winners)
+}
+
+func printWinners(winners []*person) {
+
 	for _, winner := range winners {
 		totalTime, _ := winner.getTotalTime()
 		averageTime := totalTime / 3
@@ -54,10 +62,9 @@ func printWinners(participants map[int]person) {
 		fmt.Printf("Total time %v\n", totalTime.String())
 		fmt.Printf("Average time %v\n\n", averageTime.String())
 	}
-
 }
 
-func parsePerson(file *os.File) map[int]person {
+func parsePersons(file *os.File) map[int]person {
 	scanner := bufio.NewScanner(file)
 
 	scanner.Split(bufio.ScanLines)
@@ -82,14 +89,14 @@ func parsePerson(file *os.File) map[int]person {
 			continue
 		}
 
-		race, err := getRace(split[4])
+		race, err := parseRace(split[4])
 
 		if err != nil {
 			log.Printf("%v on line %v\n", err, lineNumber)
 			continue
 		}
 
-		finalTime, err := getRaceTime(split[2], split[3])
+		finalTime, err := parseRaceTime(split[2], split[3])
 
 		if err != nil {
 			log.Printf("%v in line %v\n", err, lineNumber)
@@ -111,11 +118,10 @@ func parsePerson(file *os.File) map[int]person {
 
 	}
 
-	file.Close()
 	return persons
 }
 
-func getRaceTime(start string, end string) (time.Duration, error) {
+func parseRaceTime(start string, end string) (time.Duration, error) {
 	startTime, err := time.Parse("15:04:05", start)
 	if err != nil {
 		return 0, fmt.Errorf("Error parsing startTime: %v", err)
@@ -135,7 +141,7 @@ func getRaceTime(start string, end string) (time.Duration, error) {
 	return finalTime, nil
 }
 
-func getRace(raceType string) (RaceType, error) {
+func parseRace(raceType string) (RaceType, error) {
 	switch raceType {
 	case "1000m":
 		return Race1000m, nil
