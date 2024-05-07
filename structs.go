@@ -19,7 +19,7 @@ type person struct {
 	Races []race
 }
 
-func (p person) getTotalTime() (time.Duration, error) {
+func (p *person) getTotalTime() (time.Duration, error) {
 
 	if len(p.Races) != 3 {
 		return 0, fmt.Errorf("%v did not participate in all 3 races.", p.Name)
@@ -47,6 +47,10 @@ func NewPerson(name string, id int) *person {
 		Name:  name,
 		Races: make([]race, 0),
 	}
+}
+
+func (p *person) addRace(race *race) {
+	p.Races = append(p.Races, *race)
 }
 
 func NewRace(RaceType RaceType, StartTime string, EndTime string, FinalTime time.Duration) *race {

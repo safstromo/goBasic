@@ -22,46 +22,9 @@ func main() {
 
 	file.Close()
 
-	calculateWinners(participants)
-
-}
-
-func calculateWinners(participants map[int]person) {
-
-	var winners []*person
-	var winnerTime time.Duration
-
-	for _, person := range participants {
-
-		personTime, _ := person.getTotalTime()
-
-		if len(person.Races) == 3 {
-			if winners == nil || personTime <= winnerTime {
-				if personTime < winnerTime {
-					winners = nil
-				}
-				winners = append(winners, &person)
-				winnerTime = personTime
-
-			}
-		}
-
-	}
+	winners := calculateWinners(participants)
 
 	printWinners(winners)
-}
-
-func printWinners(winners []*person) {
-
-	for _, winner := range winners {
-		totalTime, _ := winner.getTotalTime()
-		averageTime := totalTime / 3
-
-		fmt.Println("\n-------------------------------------------------")
-		fmt.Printf("Winner is %v with ID:%v \n", winner.Name, winner.Id)
-		fmt.Printf("Total time %v\n", totalTime.String())
-		fmt.Printf("Average time %v\n\n", averageTime.String())
-	}
 }
 
 func parsePersons(file *os.File) map[int]person {
@@ -107,12 +70,12 @@ func parsePersons(file *os.File) map[int]person {
 
 		if ok {
 			newRace := NewRace(race, split[2], split[3], finalTime)
-			person.Races = append(person.Races, *newRace)
+			person.addRace(newRace)
 			persons[id] = person
 		} else {
 			newPerson := NewPerson(split[0], id)
 			newRace := NewRace(race, split[2], split[3], finalTime)
-			newPerson.Races = append(newPerson.Races, *newRace)
+			newPerson.addRace(newRace)
 			persons[id] = *newPerson
 		}
 
@@ -152,4 +115,40 @@ func parseRace(raceType string) (RaceType, error) {
 	}
 
 	return "", fmt.Errorf("Unable to parse race string: '%v'", raceType)
+}
+
+func calculateWinners(participants map[int]person) []*person {
+
+	var winners []*person
+	var winnerTime time.Duration
+
+	for _, person := range participants {
+
+		personTime, _ := person.getTotalTime()
+
+		if len(person.Races) == 3 {
+			if winners == nil || personTime <= winnerTime {
+				if personTime < winnerTime {
+					winners = nil
+				}
+				winners = append(winners, &person)
+				winnerTime = personTime
+
+			}
+		}
+	}
+	return winners
+}
+
+func printWinners(winners []*person) {
+
+	for _, winner := range winners {
+		totalTime, _ := winner.getTotalTime()
+		averageTime := totalTime / 3
+
+		fmt.Println("\n-------------------------------------------------")
+		fmt.Printf("Winner is %v with ID:%v \n", winner.Name, winner.Id)
+		fmt.Printf("Total time %v\n", totalTime.String())
+		fmt.Printf("Average time %v\n\n", averageTime.String())
+	}
 }
