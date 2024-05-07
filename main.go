@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 )
 
 func main() {
@@ -45,6 +46,12 @@ func parsePersons(file *os.File) map[int]person {
 			continue
 		}
 
+		name, err := validateName(split[0])
+
+		if err != nil {
+			log.Printf("%v on line %v", err, lineNumber)
+		}
+
 		id, err := strconv.Atoi(split[1])
 
 		if err != nil {
@@ -73,15 +80,28 @@ func parsePersons(file *os.File) map[int]person {
 			person.addRace(newRace)
 			persons[id] = person
 		} else {
-			newPerson := NewPerson(split[0], id)
+			newPerson := NewPerson(name, id)
 			newRace := NewRace(race, split[2], split[3], finalTime)
 			newPerson.addRace(newRace)
 			persons[id] = *newPerson
 		}
+	}
+	return persons
+}
 
+func validateName(name string) (string, error) {
+
+	if strings.TrimSpace(name) == "" {
+		return "", fmt.Errorf("Error parsing name, name cannot be empty")
 	}
 
-	return persons
+	for _, char := range name {
+		if !unicode.IsLetter(char) && !unicode.IsSpace(char) {
+			return "", fmt.Errorf("Error parsing name, it can only contain letters and spaces. '%v'", name)
+		}
+
+	}
+	return name, nil
 }
 
 func parseRaceTime(start string, end string) (time.Duration, error) {
