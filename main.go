@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -101,7 +102,7 @@ func printWinners(participants map[int]person) {
 		totalTime, _ := winner.getTotalTime()
 		averageTime := totalTime / 3
 
-		fmt.Println("\n-------------------------------------------------\n")
+		fmt.Println("\n-------------------------------------------------")
 		fmt.Printf("Winner is %v with ID:%v \n", winner.Name, winner.Id)
 		fmt.Printf("Total time %v\n", totalTime.String())
 		fmt.Printf("Average time %v\n\n", averageTime.String())
@@ -123,28 +124,28 @@ func parsePerson(file *os.File) map[int]person {
 		split := strings.Split(scanner.Text(), ",")
 
 		if len(split) < 4 {
-			fmt.Printf("The line is not in the correct format: '%v'\n", split)
+			log.Printf("The line is not in the correct format: '%v'\n", split)
 			continue
 		}
 
 		id, err := strconv.Atoi(split[1])
 
 		if err != nil {
-			fmt.Println(fmt.Errorf("Unable to parse Id: '%v' on line %v", split[1], lineNumber))
+			log.Println(fmt.Errorf("Unable to parse Id: '%v' on line %v", split[1], lineNumber))
 			continue
 		}
 
 		race, err := getRace(split[4])
 
 		if err != nil {
-			fmt.Printf("%v on line %v\n", err, lineNumber)
+			log.Printf("%v on line %v\n", err, lineNumber)
 			continue
 		}
 
 		finalTime, err := getRaceTime(split[2], split[3])
 
 		if err != nil {
-			fmt.Printf("%v in line %v\n", err, lineNumber)
+			log.Printf("%v in line %v\n", err, lineNumber)
 			continue
 		}
 
